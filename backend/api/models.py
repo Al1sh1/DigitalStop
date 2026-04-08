@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class BaseModel(models.Model):
@@ -28,12 +29,11 @@ class Product(BaseModel):
         return self.name
     
 
-class User(BaseModel):
+class Customer(BaseModel):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='customer')
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255)
-    address = models.TextField()
+    address = models.CharField(max_length=64)
 
 
     def __str__(self):
@@ -49,7 +49,7 @@ class Order(BaseModel):
     ]
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
     total_price = models.DecimalField(max_digits=10, decimal_places=2)
