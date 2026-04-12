@@ -1,6 +1,5 @@
 from rest_framework.views import APIView, Http404, Response
 from rest_framework import status
-from django.shortcuts import render
 
 from brand.models import Brand
 from brand.serializers import BrandSerializer
