@@ -1,61 +1,58 @@
-from django.shortcuts import render
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
+from customer.models import Customer
 from order.models import Order
 from order.serializers import OrderSerializer
 
 
-@api_view(['GET', 'POST'])
+@api_view(["GET", "POST"])
+@permission_classes([IsAuthenticated])
 def order_list(request):
-    if request.method == 'GET':
-        orders = Order.objects.all()
-        serializer = OrderSerializer(orders, many=True)
-        return Response({
-            'count': len(serializer.data),
-            'data': serializer.data
-        })
-    
-    elif request.method == 'POST':
-        serializer = OrderSerializer(data=request.data)
+    try:
+        customer = Customer.objects.get(user=request.user)
+    except Customer.DoesNotExist:
+        return Response({"detail": "Customer profile not found."}, status=404)
 
-        if serializer.is_valid():
-            serializer.save()
+    if request.method == "GET":
+        orders = Order.objects.filter(user=customer).order_by("-id")
+        return Response({"orders": OrderSerializer(orders, many=True).data})
 
-            return Response({
-                'data': serializer.data
-            })
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+    data = request.data.copy()
+    data["user_id"] = customer.id
+    serializer = OrderSerializer(data=data)
+    serializer.is_valid(raise_exception=True)
+    order = serializer.save()
+    return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
-@api_view(['GET', 'PUT', 'DELETE'])
+
+@api_view(["GET", "PUT", "PATCH", "DELETE"])
+@permission_classes([IsAuthenticated])
 def order_detail(request, order_id):
     try:
-        order = Order.objects.get(id=order_id)
-    except Order.DoesNotExist:
-        return Response({"message": "order not found"}, status=status.HTTP_400_BAD_REQUEST)
-    
-    if request.method == 'GET':
-        serializer = OrderSerializer(order)
-        return Response({
-            'data': order 
-        })
-    
-    elif request.method == 'PUT':
-        serializer = OrderSerializer(order, data=request.data, partial=True)
+        customer = Customer.objects.get(user=request.user)
+    except Customer.DoesNotExist:
+        return Response({"detail": "Customer profile not found."}, status=404)
 
-        if serializer.is_valid():
-            serializer.save()
-            return Response({
-                'data': serializer.data
-            })
-        
-        return Response({
-            'errors': serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
-    
-    elif request.method == 'DELETE':
-        order.delete()
-        return Response(status=status.HTTP_200_OK)
+    try:
+        order = Order.objects.get(id=order_id, user=customer)
+    except Order.DoesNotExist:
+        return Response({"detail": "Order not found."}, status=404)
+
+    if request.method == "GET":
+        return Response(OrderSerializer(order).data)
+
+    if request.method in ["PUT", "PATCH"]:
+        data = request.data.copy()
+        data["user_id"] = customer.id 
+        serializer = OrderSerializer(
+            order, data=data, partial=(request.method == "PATCH")
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    order.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

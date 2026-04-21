@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from rest_framework import serializers
 
 from customer.models import Customer
@@ -5,46 +7,73 @@ from order.models import Order
 from product.models import Product
 
 
-class OrderSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    status = serializers.ChoiceField(choices=['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED'])
-    quantity = serializers.IntegerField(min_value=1)
-    total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField(read_only=True)
+    product = serializers.SerializerMethodField(read_only=True)
 
-    user_id = serializers.IntegerField(write_only=True)
-    product_id = serializers.IntegerField(write_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        queryset=Customer.objects.all(),
+        source="user",
+        write_only=True,
+        required=False,
+    )
+    product_id = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(),
+        source="product",
+        write_only=True,
+    )
 
-    def validate_quanity(self, value):
-        if value <= 0:
-            raise serializers.ValidationError("quantity should be positive")
-        return value
-    
-    def validate_user_id(self, value):
-        if not Customer.objects.filter(id=value).exists():
-            raise serializers.ValidationError("user not found")
-        return value
-    
-    def validate_product_id(self, value):
-        if not Product.objects.filter(id=value).exists():
-            raise serializers.ValidationError("product not found")
-        return value
-    
-    def create(self, validated_data):
-        order = Order(
-            status=validated_data['status'],
-            quantity=validated_data['quantity'],
-            total_price=validated_data['total_price'],
-            user_id=validated_data['user_id'],
-            product_id=validated_data['product_id']
+    total_price = serializers.DecimalField(
+        max_digits=10, decimal_places=2, read_only=True
+    )
+
+    class Meta:
+        model = Order
+        fields = (
+            "id",
+            "status",
+            "quantity",
+            "total_price",
+            "user",
+            "user_id",
+            "product",
+            "product_id",
         )
-        order.save()
-        return order
-    
-    def update(self, instance, validated_data):
-        instance.status = validated_data.get('status', instance.status)
-        instance.quantity = validated_data.get('quantity', instance.quantity)
-        instance.total_price = validated_data.get('total_price', instance.total_price)
 
+    def get_user(self, obj):
+        return {
+            "id": obj.user.id,
+            "first_name": obj.user.first_name,
+            "last_name": obj.user.last_name,
+            "address": obj.user.address,
+        }
+
+    def get_product(self, obj):
+        return {
+            "id": obj.product.id,
+            "name": obj.product.name,
+            "price": str(obj.product.price),
+        }
+
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Quantity must be greater than 0.")
+        return value
+
+    def _calc_total(self, product, quantity):
+        return (Decimal(product.price) * Decimal(quantity)).quantize(Decimal("0.01"))
+
+    def create(self, validated_data):
+        product = validated_data["product"]
+        quantity = validated_data["quantity"]
+        validated_data["total_price"] = self._calc_total(product, quantity)
+        return Order.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.status = validated_data.get("status", instance.status)
+        instance.quantity = validated_data.get("quantity", instance.quantity)
+        instance.product = validated_data.get("product", instance.product)
+        instance.total_price = self._calc_total(instance.product, instance.quantity)
         instance.save()
         return instance
 
