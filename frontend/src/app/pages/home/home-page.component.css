@@ -1,0 +1,56 @@
+.home {
+  padding: 32px 16px;
+}
+
+.hero {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px;
+  border: 1px solid #d8e0ef;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f4f8ff 0%, #ffffff 100%);
+}
+
+.eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #3658b8;
+  font-size: 0.8rem;
+}
+
+h1 {
+  margin-top: 10px;
+  margin-bottom: 12px;
+  color: #132655;
+}
+
+.lead {
+  line-height: 1.6;
+  max-width: 62ch;
+  color: #32415f;
+}
+
+.actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.actions a {
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 600;
+}
+
+.actions .primary {
+  background: #1947d1;
+  color: #fff;
+}
+
+.actions .secondary {
+  border: 1px solid #1947d1;
+  color: #1947d1;
+  background: #fff;
+}

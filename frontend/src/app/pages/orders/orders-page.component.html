@@ -1,0 +1,69 @@
+<section class="orders-page">
+  <h2>Orders</h2>
+
+  @if (!isAuthenticated) {
+    <p class="error">
+      Login is required to access orders.
+      <a routerLink="/login">Open login page</a>
+    </p>
+  } @else {
+    <div class="controls">
+      <button type="button" (click)="loadProducts()">Load Products</button>
+      <button type="button" (click)="loadOrders()">Load Orders</button>
+    </div>
+
+    <div class="order-form">
+      <label>
+        Product
+        <select [(ngModel)]="selectedProductId">
+          @for (product of products; track product.id) {
+            <option [ngValue]="product.id">
+              {{ product.name }} ({{ formatPrice(product.price) }})
+            </option>
+          }
+        </select>
+      </label>
+
+      <label>
+        Quantity
+        <input type="number" min="1" [(ngModel)]="quantity" />
+      </label>
+
+      <label>
+        Status
+        <select [(ngModel)]="status">
+          <option value="PENDING">PENDING</option>
+          <option value="SHIPPED">SHIPPED</option>
+          <option value="DELIVERED">DELIVERED</option>
+          <option value="CANCELLED">CANCELLED</option>
+        </select>
+      </label>
+
+      <button type="button" (click)="createOrder()" [disabled]="loading">Create Order</button>
+    </div>
+
+    @if (errorMessage) {
+      <p class="error">{{ errorMessage }}</p>
+    }
+
+    @if (successMessage) {
+      <p class="success">{{ successMessage }}</p>
+    }
+
+    <div class="orders-list">
+      @for (order of orders; track order.id) {
+        <article class="order-card">
+          <p><strong>#{{ order.id }}</strong> {{ order.status }}</p>
+          <p>Product: {{ order.product.name }}</p>
+          <p>Qty: {{ order.quantity }}</p>
+          <p>Total: {{ formatPrice(order.total_price) }}</p>
+          <button type="button" (click)="deleteOrder(order.id)">Delete</button>
+        </article>
+      }
+    </div>
+
+    @if (!orders.length && !loading) {
+      <p class="empty">No orders yet.</p>
+    }
+  }
+</section>

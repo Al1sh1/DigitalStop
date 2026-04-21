@@ -1,0 +1,106 @@
+.orders-page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+}
+
+h2 {
+  margin-top: 0;
+  color: #1b2f60;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.order-form {
+  border: 1px solid #d8e0ef;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: #25365d;
+  font-size: 0.9rem;
+}
+
+input,
+select {
+  border: 1px solid #b8c5e6;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+button {
+  border: 1px solid #355fcc;
+  color: #355fcc;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #edf2ff;
+}
+
+button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.orders-list {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.order-card {
+  border: 1px solid #d8e0ef;
+  border-radius: 10px;
+  padding: 12px;
+  background: #fff;
+}
+
+.order-card p {
+  margin: 0 0 6px;
+}
+
+.error,
+.success,
+.empty {
+  margin-top: 12px;
+  padding: 8px 10px;
+  border-radius: 8px;
+}
+
+.error {
+  color: #a51a2f;
+  background: #ffeef1;
+  border: 1px solid #f3b1bc;
+}
+
+.success {
+  color: #106435;
+  background: #eaf8ef;
+  border: 1px solid #93d2aa;
+}
+
+.empty {
+  color: #38507c;
+  background: #f3f7ff;
+  border: 1px solid #cdd9f3;
+}

@@ -1,0 +1,30 @@
+<section class="login-page">
+  <h2>Login (JWT)</h2>
+
+  @if (!isAuthenticated) {
+    <div class="form-card">
+      <label>
+        Username
+        <input type="text" [(ngModel)]="username" placeholder="username" />
+      </label>
+
+      <label>
+        Password
+        <input type="password" [(ngModel)]="password" placeholder="password" />
+      </label>
+
+      <button type="button" (click)="login()" [disabled]="loading">
+        {{ loading ? 'Signing in...' : 'Sign in' }}
+      </button>
+    </div>
+  } @else {
+    <div class="session-card">
+      <p>You are logged in as <strong>{{ currentUsername }}</strong>.</p>
+      <button type="button" (click)="logout()">Logout</button>
+    </div>
+  }
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+</section>

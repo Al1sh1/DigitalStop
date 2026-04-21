@@ -1,0 +1,117 @@
+.shop-page {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px 32px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbar h2 {
+  margin: 0;
+  color: #1b2f60;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 10px;
+}
+
+button {
+  border: 1px solid #355fcc;
+  background: #fff;
+  color: #355fcc;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #edf2ff;
+}
+
+.filters {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 10px;
+  border: 1px solid #d8e0ef;
+  background: #f9fbff;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.9rem;
+  gap: 6px;
+  color: #1f2d4d;
+}
+
+input,
+select {
+  border: 1px solid #b8c5e6;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.cards {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.card {
+  border: 1px solid #d8e0ef;
+  border-radius: 10px;
+  background: #fff;
+  padding: 14px;
+}
+
+.brand {
+  margin: 0;
+  color: #4d5f87;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+h3 {
+  margin: 6px 0;
+  color: #132655;
+}
+
+.description {
+  margin: 0;
+  color: #334265;
+  min-height: 44px;
+}
+
+.price {
+  margin: 12px 0 0;
+  font-weight: 700;
+  color: #1d48c8;
+}
+
+.error {
+  margin-top: 12px;
+  color: #a51a2f;
+  background: #ffeef1;
+  border: 1px solid #f3b1bc;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.loading,
+.empty {
+  margin-top: 12px;
+  color: #38507c;
+}
