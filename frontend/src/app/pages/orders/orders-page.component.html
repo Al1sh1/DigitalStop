@@ -8,7 +8,6 @@
     </p>
   } @else {
     <div class="controls">
-      <button type="button" (click)="loadProducts()">Load Products</button>
       <button type="button" (click)="loadOrders()">Load Orders</button>
     </div>
 
@@ -27,16 +26,6 @@
       <label>
         Quantity
         <input type="number" min="1" [(ngModel)]="quantity" />
-      </label>
-
-      <label>
-        Status
-        <select [(ngModel)]="status">
-          <option value="PENDING">PENDING</option>
-          <option value="SHIPPED">SHIPPED</option>
-          <option value="DELIVERED">DELIVERED</option>
-          <option value="CANCELLED">CANCELLED</option>
-        </select>
       </label>
 
       <button type="button" (click)="createOrder()" [disabled]="loading">Create Order</button>

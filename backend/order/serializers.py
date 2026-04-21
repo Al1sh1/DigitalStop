@@ -78,3 +78,8 @@ class OrderSerializer(serializers.ModelSerializer):
         return instance
 
 
+class OrderStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ("status",)
+

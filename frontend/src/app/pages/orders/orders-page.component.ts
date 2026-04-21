@@ -16,7 +16,6 @@ export class OrdersPageComponent implements OnInit {
   orders: Order[] = [];
   selectedProductId: number | null = null;
   quantity = 1;
-  status: 'PENDING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED' = 'PENDING';
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -88,7 +87,6 @@ export class OrdersPageComponent implements OnInit {
     const payload: CreateOrderPayload = {
       product_id: this.selectedProductId,
       quantity: this.quantity,
-      status: this.status,
     };
 
     this.api.createOrder(payload).subscribe({

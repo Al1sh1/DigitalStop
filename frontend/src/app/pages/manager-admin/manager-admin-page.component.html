@@ -1,0 +1,104 @@
+<section class="manager-page">
+  <h2>Manager Admin</h2>
+  <p class="hint">Add products and manage delivery progress.</p>
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (successMessage) {
+    <p class="success">{{ successMessage }}</p>
+  }
+
+  @if (!canManage) {
+    <p class="hint">This page is available only for manager/admin accounts.</p>
+  } @else {
+    <section class="card">
+      <h3>Add Product</h3>
+      <div class="form-grid">
+        <label>
+          Name
+          <input type="text" [(ngModel)]="name" />
+        </label>
+
+        <label>
+          Brand
+          <select [(ngModel)]="brandId">
+            @for (brand of brands; track brand.id) {
+              <option [ngValue]="brand.id">{{ brand.name }}</option>
+            }
+          </select>
+        </label>
+
+        <label>
+          Price
+          <input type="text" [(ngModel)]="price" placeholder="999.00" />
+        </label>
+
+        <label>
+          Image URL
+          <input type="text" [(ngModel)]="imageUrl" placeholder="https://..." />
+        </label>
+
+        <label class="full">
+          Description
+          <textarea rows="3" [(ngModel)]="description"></textarea>
+        </label>
+
+        <label class="full">
+          Specs JSON (optional)
+          <textarea
+            rows="4"
+            [(ngModel)]="specsJson"
+            placeholder='{"Display":"6.7-inch OLED", "RAM":"8 GB"}'
+          ></textarea>
+        </label>
+      </div>
+
+      <div class="actions">
+        <button type="button" (click)="createProduct()" [disabled]="creatingProduct || loadingBrands">
+          Add Product
+        </button>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="header-row">
+        <h3>Delivery Status Tracking</h3>
+        <button type="button" class="secondary" (click)="loadOrders()" [disabled]="loadingOrders">Refresh</button>
+      </div>
+
+      @if (loadingOrders) {
+        <p class="hint">Loading orders...</p>
+      }
+
+      @if (!loadingOrders && !orders.length) {
+        <p class="hint">No orders yet.</p>
+      }
+
+      <div class="orders-grid">
+        @for (order of orders; track order.id) {
+          <article class="order-card">
+            <p><strong>#{{ order.id }}</strong></p>
+            <p>Status: <strong>{{ order.status }}</strong></p>
+            <p>Customer: {{ order.user.first_name }} {{ order.user.last_name }}</p>
+            <p>Product: {{ order.product.name }}</p>
+            <p>Qty: {{ order.quantity }}</p>
+            <p>Total: {{ formatPrice(order.total_price) }}</p>
+
+            <div class="status-actions">
+              <select [(ngModel)]="draftStatusByOrderId[order.id]">
+                @for (status of statusOptions; track status) {
+                  <option [ngValue]="status">{{ status }}</option>
+                }
+              </select>
+              <button type="button" (click)="updateOrderStatus(order)" [disabled]="updatingOrderId === order.id">
+                Update status
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</section>

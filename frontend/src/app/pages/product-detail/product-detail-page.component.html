@@ -1,0 +1,62 @@
+<section class="product-detail-page">
+  <a class="back-link" routerLink="/shop">&larr; Back to shop</a>
+
+  @if (loading) {
+    <p class="loading">Loading product...</p>
+  }
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (!loading && !errorMessage && product) {
+    <article class="detail-card">
+      <img class="hero-image" [src]="productImageUrl()" [alt]="product.name" />
+
+      <div class="detail-content">
+        <p class="brand">{{ product.brand.name }}</p>
+        <h2>{{ product.name }}</h2>
+        <p class="description">{{ product.description }}</p>
+        <p class="meta"><strong>Country:</strong> {{ product.brand.country }}</p>
+        <p class="meta"><strong>Brand:</strong> {{ product.brand.description }}</p>
+        <p class="price">{{ formatPrice(product.price) }}</p>
+
+        @if (specEntries.length) {
+          <section class="specs-block">
+            <h3>Detailed specifications</h3>
+            <dl class="specs-list">
+              @for (spec of specEntries; track spec.key) {
+                <div class="spec-item">
+                  <dt>{{ spec.key }}</dt>
+                  <dd>{{ spec.value }}</dd>
+                </div>
+              }
+            </dl>
+          </section>
+        }
+
+        <div class="card-footer">
+          <div class="cart-actions">
+            <label>
+              Qty
+              <input type="number" min="1" [(ngModel)]="quantity" />
+            </label>
+            <button type="button" (click)="addToCart()">Add to cart</button>
+            <a class="cart-link" routerLink="/cart">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path
+                  d="M7 4h-2l-1 2h2l2.4 9.2a2 2 0 0 0 1.94 1.5h7.26a2 2 0 0 0 1.93-1.48l1.34-5.02a1 1 0 0 0-.97-1.26h-10.9l-.48-2h12.38a1 1 0 0 0 0-2h-12.9l-.22-.82A2 2 0 0 0 7 4Zm3 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
+                />
+              </svg>
+              <span>Open cart</span>
+            </a>
+          </div>
+
+          @if (actionMessage) {
+            <p class="success">{{ actionMessage }}</p>
+          }
+        </div>
+      </div>
+    </article>
+  }
+</section>

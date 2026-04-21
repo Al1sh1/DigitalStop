@@ -7,13 +7,25 @@
   <nav>
     <a routerLink="/home" routerLinkActive="active">Home</a>
     <a routerLink="/shop" routerLinkActive="active">Shop</a>
+    <a class="cart-link" routerLink="/cart" routerLinkActive="active">
+      Cart
+      @if ((cartItemsCount$ | async); as count) {
+        @if (count > 0) {
+          <span class="cart-badge">{{ count }}</span>
+        }
+      }
+    </a>
     <a routerLink="/orders" routerLinkActive="active">Orders</a>
-    <a routerLink="/login" routerLinkActive="active">Login</a>
+    @if (authService.isAuthenticated()) {
+      <a routerLink="/manager" routerLinkActive="active">Manager</a>
+    }
+    @if (!authService.isAuthenticated()) {
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+    }
   </nav>
 
   @if (authService.isAuthenticated()) {
     <div class="session">
-      <span>{{ authService.getUsername() }}</span>
       <button type="button" (click)="logout()">Logout</button>
     </div>
   }

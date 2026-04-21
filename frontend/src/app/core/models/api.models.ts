@@ -15,7 +15,14 @@ export interface Product {
   name: string;
   description: string;
   price: string;
+  image_url: string;
+  specs?: Record<string, string>;
   brand: Brand;
+}
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
 }
 
 export interface ProductListResponse {
@@ -55,5 +62,22 @@ export interface OrderListResponse {
 export interface CreateOrderPayload {
   product_id: number;
   quantity: number;
-  status?: 'PENDING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED';
+}
+
+export interface ManagerCreateProductPayload {
+  name: string;
+  description: string;
+  price: string;
+  image_url: string;
+  specs?: Record<string, string>;
+  brand_id: number;
+}
+
+export interface ManagerUpdateProductPayload {
+  name?: string;
+  description?: string;
+  price?: string;
+  image_url?: string;
+  specs?: Record<string, string>;
+  brand_id?: number;
 }

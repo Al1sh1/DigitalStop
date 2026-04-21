@@ -1,0 +1,64 @@
+<section class="cart-page">
+  <h2>Cart</h2>
+
+  @if (!isAuthenticated) {
+    <p class="error">
+      Login is required to checkout.
+      <a routerLink="/login">Open login page</a>
+    </p>
+  }
+
+  @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (successMessage) {
+    <p class="success">{{ successMessage }}</p>
+  }
+
+  @if (!items.length) {
+    <p class="empty">
+      Cart is empty. <a routerLink="/shop">Go to shop</a>
+    </p>
+  } @else {
+    <div class="cart-list">
+      @for (item of items; track item.product.id) {
+        <article class="cart-item">
+          <img [src]="item.product.image_url || 'https://placehold.co/300x210?text=Phone'" [alt]="item.product.name" />
+
+          <div class="content">
+            <p class="brand">{{ item.product.brand.name }}</p>
+            <h3>{{ item.product.name }}</h3>
+            <p class="price">{{ formatPrice(item.product.price) }}</p>
+
+            <div class="item-actions">
+              <label>
+                Qty
+                <input
+                  type="number"
+                  min="1"
+                  [ngModel]="item.quantity"
+                  (ngModelChange)="updateQuantity(item.product.id, $event)"
+                />
+              </label>
+
+              <button type="button" class="remove" (click)="remove(item.product.id)">Remove</button>
+            </div>
+
+            <p class="subtotal">Subtotal: {{ itemTotal(item) }}</p>
+          </div>
+        </article>
+      }
+    </div>
+
+    <section class="summary">
+      <p><strong>Total:</strong> {{ formatPrice(totalPrice) }}</p>
+      <div class="summary-actions">
+        <button type="button" class="secondary" (click)="clearCart()" [disabled]="checkoutLoading">
+          Clear cart
+        </button>
+        <button type="button" (click)="checkout()" [disabled]="checkoutLoading">Checkout</button>
+      </div>
+    </section>
+  }
+</section>

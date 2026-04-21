@@ -22,13 +22,14 @@ def order_list(request):
 
     data = request.data.copy()
     data["user_id"] = customer.id
+    data["status"] = "PENDING"
     serializer = OrderSerializer(data=data)
     serializer.is_valid(raise_exception=True)
     order = serializer.save()
     return Response(OrderSerializer(order).data, status=status.HTTP_201_CREATED)
 
 
-@api_view(["GET", "PUT", "PATCH", "DELETE"])
+@api_view(["GET", "DELETE"])
 @permission_classes([IsAuthenticated])
 def order_detail(request, order_id):
     try:
@@ -43,16 +44,6 @@ def order_detail(request, order_id):
 
     if request.method == "GET":
         return Response(OrderSerializer(order).data)
-
-    if request.method in ["PUT", "PATCH"]:
-        data = request.data.copy()
-        data["user_id"] = customer.id 
-        serializer = OrderSerializer(
-            order, data=data, partial=(request.method == "PATCH")
-        )
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
 
     order.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)

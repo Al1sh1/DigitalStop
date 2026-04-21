@@ -1,22 +1,21 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ApiService } from '../../core/services/api.service';
+import { RouterLink } from '@angular/router';
 import { Brand, Product } from '../../core/models/api.models';
+import { ApiService } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-shop-page',
-  imports: [FormsModule],
+  imports: [FormsModule, RouterLink],
   templateUrl: './shop-page.component.html',
   styleUrl: './shop-page.component.css',
 })
 export class ShopPageComponent implements OnInit {
   products: Product[] = [];
-  brands: Brand[] = [];
   selectedBrandId = 'all';
   sortBy: 'default' | 'price-asc' | 'price-desc' | 'name-asc' = 'default';
   searchText = '';
   loadingProducts = false;
-  loadingBrands = false;
   errorMessage = '';
 
   constructor(
@@ -26,7 +25,6 @@ export class ShopPageComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadProducts();
-    this.loadBrands();
   }
 
   loadProducts(): void {
@@ -46,21 +44,15 @@ export class ShopPageComponent implements OnInit {
     });
   }
 
-  loadBrands(): void {
-    this.loadingBrands = true;
-    this.errorMessage = '';
-    this.api.getBrands().subscribe({
-      next: (brands) => {
-        this.brands = brands;
-        this.loadingBrands = false;
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.errorMessage = this.api.getErrorMessage(error);
-        this.loadingBrands = false;
-        this.cdr.markForCheck();
-      },
-    });
+  get brands(): Brand[] {
+    const uniqueBrands = new Map<number, Brand>();
+    for (const product of this.products) {
+      if (!uniqueBrands.has(product.brand.id)) {
+        uniqueBrands.set(product.brand.id, product.brand);
+      }
+    }
+
+    return [...uniqueBrands.values()].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   get visibleProducts(): Product[] {
@@ -91,6 +83,10 @@ export class ShopPageComponent implements OnInit {
 
   formatPrice(value: string): string {
     return `$${Number(value).toFixed(2)}`;
+  }
+
+  productImageUrl(product: Product): string {
+    return product.image_url || 'https://placehold.co/600x420?text=Phone';
   }
 
   private priceValue(value: string): number {

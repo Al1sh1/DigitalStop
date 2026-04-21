@@ -6,6 +6,8 @@ import {
   BrandListResponse,
   CreateOrderPayload,
   JwtTokenPair,
+  ManagerCreateProductPayload,
+  ManagerUpdateProductPayload,
   Order,
   OrderListResponse,
   Product,
@@ -39,6 +41,12 @@ export class ApiService {
       .pipe(timeout(this.requestTimeoutMs), map((response) => response.products ?? []));
   }
 
+  getProduct(productId: number): Observable<Product> {
+    return this.http
+      .get<Product>(`${this.apiBaseUrl}/products/${productId}/`)
+      .pipe(timeout(this.requestTimeoutMs));
+  }
+
   getBrands(): Observable<Brand[]> {
     return this.http
       .get<BrandListResponse>(`${this.apiBaseUrl}/brands/`)
@@ -54,6 +62,45 @@ export class ApiService {
   createOrder(payload: CreateOrderPayload): Observable<Order> {
     return this.http
       .post<Order>(`${this.apiBaseUrl}/order/`, payload)
+      .pipe(timeout(this.requestTimeoutMs));
+  }
+
+  managerGetOrders(): Observable<Order[]> {
+    return this.http
+      .get<OrderListResponse>(`${this.apiBaseUrl}/manager/orders/`)
+      .pipe(timeout(this.requestTimeoutMs), map((response) => response.orders ?? []));
+  }
+
+  managerGetProducts(): Observable<Product[]> {
+    return this.http
+      .get<ProductListResponse>(`${this.apiBaseUrl}/manager/products/`)
+      .pipe(timeout(this.requestTimeoutMs), map((response) => response.products ?? []));
+  }
+
+  managerAddProduct(payload: ManagerCreateProductPayload): Observable<Product> {
+    return this.http
+      .post<Product>(`${this.apiBaseUrl}/manager/products/`, payload)
+      .pipe(timeout(this.requestTimeoutMs));
+  }
+
+  managerUpdateOrderStatus(
+    orderId: number,
+    status: 'PENDING' | 'SHIPPED' | 'DELIVERED' | 'CANCELLED',
+  ): Observable<Order> {
+    return this.http
+      .patch<Order>(`${this.apiBaseUrl}/manager/orders/${orderId}/status/`, { status })
+      .pipe(timeout(this.requestTimeoutMs));
+  }
+
+  managerUpdateProduct(productId: number, payload: ManagerUpdateProductPayload): Observable<Product> {
+    return this.http
+      .patch<Product>(`${this.apiBaseUrl}/manager/products/${productId}/`, payload)
+      .pipe(timeout(this.requestTimeoutMs));
+  }
+
+  managerDeleteProduct(productId: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.apiBaseUrl}/manager/products/${productId}/`)
       .pipe(timeout(this.requestTimeoutMs));
   }
 

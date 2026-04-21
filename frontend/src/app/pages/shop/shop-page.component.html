@@ -1,10 +1,6 @@
 <section class="shop-page">
   <div class="toolbar">
     <h2>Shop</h2>
-    <div class="toolbar-actions">
-      <button type="button" (click)="loadProducts()">Load Products</button>
-      <button type="button" (click)="loadBrands()">Load Brands</button>
-    </div>
   </div>
 
   <div class="filters">
@@ -38,17 +34,19 @@
     <p class="error">{{ errorMessage }}</p>
   }
 
-  @if (loadingProducts || loadingBrands) {
+  @if (loadingProducts) {
     <p class="loading">Loading data...</p>
   }
 
   <div class="cards">
     @for (product of visibleProducts; track product.id) {
       <article class="card">
+        <img class="product-image" [src]="productImageUrl(product)" [alt]="product.name" loading="lazy" />
         <p class="brand">{{ product.brand.name }}</p>
         <h3>{{ product.name }}</h3>
         <p class="description">{{ product.description }}</p>
         <p class="price">{{ formatPrice(product.price) }}</p>
+        <a class="details-link" [routerLink]="['/shop', product.id]">View details</a>
       </article>
     }
   </div>
