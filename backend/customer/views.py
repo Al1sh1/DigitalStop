@@ -1,3 +1,5 @@
+from logging import Manager
+
 from django.db import transaction
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
@@ -37,22 +39,68 @@ def login(request):
     user = serializer.validated_data["user"]
     token, _ = Token.objects.get_or_create(user=user)
 
-    try:
-        customer = Customer.objects.get(user=user)
-    except Customer.DoesNotExist:
+    if user.is_superuser:
         return Response(
-            {"success": False, "error": "customer profile not found"},
-            status=status.HTTP_404_NOT_FOUND,
+            {
+                "token": token.key,
+                "user_type": "superuser",
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "is_superuser": True,
+                    "is_staff": user.is_staff,
+                },
+            },
+            status=status.HTTP_200_OK,
         )
 
+    manager = Manager.objects.filter(user=user).first()
+    if manager:
+        return Response(
+            {
+                "token": token.key,
+                "user_type": "manager",
+                "user": {
+                    "id": manager.id,
+                    "user_id": user.id,
+                    "username": user.username,
+                    "email": user.email,
+                    "first_name": manager.first_name,
+                    "last_name": manager.last_name,
+                    "department": manager.department,
+                },
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    customer = Customer.objects.filter(user=user).first()
+    if customer:
+        return Response(
+            {
+                "success": True,
+                "token": token.key,
+                "user_type": "customer",
+                "user": CustomerAuthSerializer(customer).data,
+            },
+            status=status.HTTP_200_OK,
+        )
+    
     return Response(
         {
+            "success": True,
             "token": token.key,
-            "user": CustomerAuthSerializer(customer).data,
+            "user_type": "user",
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "is_superuser": user.is_superuser,
+                "is_staff": user.is_staff,
+            },
         },
         status=status.HTTP_200_OK,
     )
-
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])

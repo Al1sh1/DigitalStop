@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'brand.apps.BrandConfig',
     'customer.apps.CustomerConfig',
     'order.apps.OrderConfig',
+    'manager.apps.ManagerConfig',
     'product.apps.ProductConfig',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
