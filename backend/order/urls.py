@@ -1,6 +1,6 @@
 from django.urls import path
 
-from backend.order.views import order_detail, order_list
+from order.views import order_detail, order_list
 
 
 urlpatterns = [

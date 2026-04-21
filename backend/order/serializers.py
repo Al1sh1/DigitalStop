@@ -1,13 +1,13 @@
 from rest_framework import serializers
 
-from backend.customer.models import Customer
-from backend.order.models import Order
-from backend.product.models import Product
+from customer.models import Customer
+from order.models import Order
+from product.models import Product
 
 
 class OrderSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    status = serializers.CharField(choices=['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED'])
+    status = serializers.ChoiceField(choices=['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED'])
     quantity = serializers.IntegerField(min_value=1)
     total_price = serializers.DecimalField(max_digits=10, decimal_places=2)
 

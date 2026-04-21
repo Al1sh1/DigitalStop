@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from backend.order.models import Order
-from backend.order.serializers import OrderSerializer
+from order.models import Order
+from order.serializers import OrderSerializer
 
 
 @api_view(['GET', 'POST'])
