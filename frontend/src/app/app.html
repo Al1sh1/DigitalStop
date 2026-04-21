@@ -7,16 +7,20 @@
   <nav>
     <a routerLink="/home" routerLinkActive="active">Home</a>
     <a routerLink="/shop" routerLinkActive="active">Shop</a>
-    <a class="cart-link" routerLink="/cart" routerLinkActive="active">
-      Cart
-      @if ((cartItemsCount$ | async); as count) {
-        @if (count > 0) {
-          <span class="cart-badge">{{ count }}</span>
+    @if (!(canAccessManager$ | async)) {
+      <a class="cart-link" routerLink="/cart" routerLinkActive="active">
+        Cart
+        @if ((cartItemsCount$ | async); as count) {
+          @if (count > 0) {
+            <span class="cart-badge">{{ count }}</span>
+          }
         }
-      }
-    </a>
-    <a routerLink="/orders" routerLinkActive="active">Orders</a>
-    @if (authService.isAuthenticated()) {
+      </a>
+    }
+    @if (canAccessCustomerOrders$ | async) {
+      <a routerLink="/orders" routerLinkActive="active">Orders</a>
+    }
+    @if (canAccessManager$ | async) {
       <a routerLink="/manager" routerLinkActive="active">Manager</a>
     }
     @if (!authService.isAuthenticated()) {

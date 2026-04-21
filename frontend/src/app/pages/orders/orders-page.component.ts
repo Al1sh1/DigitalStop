@@ -1,21 +1,17 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { CreateOrderPayload, Order, Product } from '../../core/models/api.models';
+import { Order } from '../../core/models/api.models';
 import { ApiService } from '../../core/services/api.service';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-orders-page',
-  imports: [FormsModule, RouterLink],
+  imports: [RouterLink],
   templateUrl: './orders-page.component.html',
   styleUrl: './orders-page.component.css',
 })
 export class OrdersPageComponent implements OnInit {
-  products: Product[] = [];
   orders: Order[] = [];
-  selectedProductId: number | null = null;
-  quantity = 1;
   loading = false;
   errorMessage = '';
   successMessage = '';
@@ -28,33 +24,12 @@ export class OrdersPageComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.isAuthenticated) {
-      this.loadProducts();
       this.loadOrders();
     }
   }
 
   get isAuthenticated(): boolean {
     return this.authService.isAuthenticated();
-  }
-
-  loadProducts(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.api.getProducts().subscribe({
-      next: (products) => {
-        this.products = products;
-        if (!this.selectedProductId && this.products.length > 0) {
-          this.selectedProductId = this.products[0].id;
-        }
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.errorMessage = this.api.getErrorMessage(error);
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-    });
   }
 
   loadOrders(): void {
@@ -64,36 +39,6 @@ export class OrdersPageComponent implements OnInit {
       next: (orders) => {
         this.orders = orders;
         this.loading = false;
-        this.cdr.markForCheck();
-      },
-      error: (error) => {
-        this.errorMessage = this.api.getErrorMessage(error);
-        this.loading = false;
-        this.cdr.markForCheck();
-      },
-    });
-  }
-
-  createOrder(): void {
-    if (this.selectedProductId === null) {
-      this.errorMessage = 'Select a product first.';
-      return;
-    }
-
-    this.loading = true;
-    this.errorMessage = '';
-    this.successMessage = '';
-
-    const payload: CreateOrderPayload = {
-      product_id: this.selectedProductId,
-      quantity: this.quantity,
-    };
-
-    this.api.createOrder(payload).subscribe({
-      next: () => {
-        this.successMessage = 'Order created successfully.';
-        this.loading = false;
-        this.loadOrders();
         this.cdr.markForCheck();
       },
       error: (error) => {

@@ -181,6 +181,15 @@ h2 {
   padding: 8px 10px;
 }
 
+.hint {
+  margin: 0;
+  color: #38507c;
+  background: #f3f7ff;
+  border: 1px solid #cdd9f3;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
 .loading {
   margin-top: 12px;
   color: #38507c;

@@ -35,27 +35,33 @@
           </section>
         }
 
-        <div class="card-footer">
-          <div class="cart-actions">
-            <label>
-              Qty
-              <input type="number" min="1" [(ngModel)]="quantity" />
-            </label>
-            <button type="button" (click)="addToCart()">Add to cart</button>
-            <a class="cart-link" routerLink="/cart">
-              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path
-                  d="M7 4h-2l-1 2h2l2.4 9.2a2 2 0 0 0 1.94 1.5h7.26a2 2 0 0 0 1.93-1.48l1.34-5.02a1 1 0 0 0-.97-1.26h-10.9l-.48-2h12.38a1 1 0 0 0 0-2h-12.9l-.22-.82A2 2 0 0 0 7 4Zm3 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
-                />
-              </svg>
-              <span>Open cart</span>
-            </a>
-          </div>
+        @if (canBuy) {
+          <div class="card-footer">
+            <div class="cart-actions">
+              <label>
+                Quantity
+                <input type="number" min="1" [(ngModel)]="quantity" />
+              </label>
+              <button type="button" (click)="addToCart()">Add to cart</button>
+              <a class="cart-link" routerLink="/cart">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path
+                    d="M7 4h-2l-1 2h2l2.4 9.2a2 2 0 0 0 1.94 1.5h7.26a2 2 0 0 0 1.93-1.48l1.34-5.02a1 1 0 0 0-.97-1.26h-10.9l-.48-2h12.38a1 1 0 0 0 0-2h-12.9l-.22-.82A2 2 0 0 0 7 4Zm3 15a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Zm8 0a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3Z"
+                  />
+                </svg>
+                <span>Open cart</span>
+              </a>
+            </div>
 
-          @if (actionMessage) {
-            <p class="success">{{ actionMessage }}</p>
-          }
-        </div>
+            @if (actionMessage) {
+              <p class="success">{{ actionMessage }}</p>
+            }
+          </div>
+        } @else {
+          <div class="card-footer">
+            <p class="hint">Manager account cannot purchase products.</p>
+          </div>
+        }
       </div>
     </article>
   }

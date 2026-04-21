@@ -1,5 +1,9 @@
 <section class="orders-page">
-  <h2>Orders</h2>
+  <header class="page-hero">
+    <div>
+      <h2>Orders</h2>
+    </div>
+  </header>
 
   @if (!isAuthenticated) {
     <p class="error">
@@ -9,26 +13,6 @@
   } @else {
     <div class="controls">
       <button type="button" (click)="loadOrders()">Load Orders</button>
-    </div>
-
-    <div class="order-form">
-      <label>
-        Product
-        <select [(ngModel)]="selectedProductId">
-          @for (product of products; track product.id) {
-            <option [ngValue]="product.id">
-              {{ product.name }} ({{ formatPrice(product.price) }})
-            </option>
-          }
-        </select>
-      </label>
-
-      <label>
-        Quantity
-        <input type="number" min="1" [(ngModel)]="quantity" />
-      </label>
-
-      <button type="button" (click)="createOrder()" [disabled]="loading">Create Order</button>
     </div>
 
     @if (errorMessage) {
@@ -42,11 +26,24 @@
     <div class="orders-list">
       @for (order of orders; track order.id) {
         <article class="order-card">
-          <p><strong>#{{ order.id }}</strong> {{ order.status }}</p>
-          <p>Product: {{ order.product.name }}</p>
-          <p>Qty: {{ order.quantity }}</p>
-          <p>Total: {{ formatPrice(order.total_price) }}</p>
-          <button type="button" (click)="deleteOrder(order.id)">Delete</button>
+          <div class="order-card-header">
+            <p class="order-number">#{{ order.id }}</p>
+            <span class="status-badge" [attr.data-status]="order.status">{{ order.status }}</span>
+          </div>
+
+          <p class="product-name">{{ order.product.name }}</p>
+
+          <div class="order-meta">
+            <span>Quantity</span>
+            <strong>{{ order.quantity }}</strong>
+          </div>
+
+          <div class="order-meta">
+            <span>Total</span>
+            <strong>{{ formatPrice(order.total_price) }}</strong>
+          </div>
+
+          <button type="button" class="danger-button" (click)="deleteOrder(order.id)">Delete</button>
         </article>
       }
     </div>

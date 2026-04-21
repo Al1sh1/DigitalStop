@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
-import { authGuard } from './core/guards/auth.guard';
+import { customerGuard } from './core/guards/customer.guard';
+import { managerGuard } from './core/guards/manager.guard';
+import { nonManagerGuard } from './core/guards/non-manager.guard';
 import { CartPageComponent } from './pages/cart/cart-page.component';
 import { HomePageComponent } from './pages/home/home-page.component';
 import { LoginPageComponent } from './pages/login/login-page.component';
@@ -11,11 +13,11 @@ import { ShopPageComponent } from './pages/shop/shop-page.component';
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'home' },
   { path: 'home', component: HomePageComponent },
-  { path: 'manager', component: ManagerAdminPageComponent, canActivate: [authGuard] },
-  { path: 'cart', component: CartPageComponent },
+  { path: 'manager', component: ManagerAdminPageComponent, canActivate: [managerGuard] },
+  { path: 'cart', component: CartPageComponent, canActivate: [nonManagerGuard] },
   { path: 'shop/:id', component: ProductDetailPageComponent },
   { path: 'shop', component: ShopPageComponent },
   { path: 'login', component: LoginPageComponent },
-  { path: 'orders', component: OrdersPageComponent },
+  { path: 'orders', component: OrdersPageComponent, canActivate: [customerGuard] },
   { path: '**', redirectTo: 'home' },
 ];

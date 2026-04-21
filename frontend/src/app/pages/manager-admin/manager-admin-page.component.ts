@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Brand, Order } from '../../core/models/api.models';
+import { Brand, Order, Product } from '../../core/models/api.models';
 import { ApiService } from '../../core/services/api.service';
 
 @Component({
@@ -14,6 +14,7 @@ export class ManagerAdminPageComponent implements OnInit {
   readonly statusOptions: Array<Order['status']> = ['PENDING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
   brands: Brand[] = [];
+  products: Product[] = [];
   orders: Order[] = [];
   draftStatusByOrderId: Record<number, Order['status']> = {};
 
@@ -24,9 +25,20 @@ export class ManagerAdminPageComponent implements OnInit {
   brandId: number | null = null;
   specsJson = '';
 
+  editingProductId: number | null = null;
+  editName = '';
+  editDescription = '';
+  editPrice = '';
+  editImageUrl = '';
+  editBrandId: number | null = null;
+  editSpecsJson = '';
+
   loadingBrands = false;
+  loadingProducts = false;
   loadingOrders = false;
   creatingProduct = false;
+  savingProductId: number | null = null;
+  deletingProductId: number | null = null;
   updatingOrderId: number | null = null;
   canManage = true;
 
@@ -63,6 +75,30 @@ export class ManagerAdminPageComponent implements OnInit {
     });
   }
 
+  loadProducts(): void {
+    if (!this.canManage) {
+      return;
+    }
+
+    this.loadingProducts = true;
+    this.errorMessage = '';
+
+    this.api.managerGetProducts().subscribe({
+      next: (products) => {
+        this.products = products;
+        this.loadingProducts = false;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        this.loadingProducts = false;
+        if (!this.handlePermissionError(error)) {
+          this.errorMessage = this.api.getErrorMessage(error);
+        }
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
   loadOrders(): void {
     if (!this.canManage) {
       return;
@@ -79,6 +115,7 @@ export class ManagerAdminPageComponent implements OnInit {
           this.draftStatusByOrderId[order.id] = order.status;
         }
         this.loadBrands();
+        this.loadProducts();
         this.loadingOrders = false;
         this.cdr.markForCheck();
       },
@@ -131,6 +168,7 @@ export class ManagerAdminPageComponent implements OnInit {
           this.price = '';
           this.imageUrl = '';
           this.specsJson = '';
+          this.loadProducts();
           this.cdr.markForCheck();
         },
         error: (error) => {
@@ -141,6 +179,104 @@ export class ManagerAdminPageComponent implements OnInit {
           this.cdr.markForCheck();
         },
       });
+  }
+
+  startEditProduct(product: Product): void {
+    this.editingProductId = product.id;
+    this.editName = product.name;
+    this.editDescription = product.description;
+    this.editPrice = product.price;
+    this.editImageUrl = product.image_url;
+    this.editBrandId = product.brand.id;
+    this.editSpecsJson = product.specs ? JSON.stringify(product.specs, null, 2) : '';
+    this.successMessage = '';
+    this.errorMessage = '';
+  }
+
+  cancelEditProduct(): void {
+    this.editingProductId = null;
+    this.editName = '';
+    this.editDescription = '';
+    this.editPrice = '';
+    this.editImageUrl = '';
+    this.editBrandId = null;
+    this.editSpecsJson = '';
+  }
+
+  saveProductChanges(productId: number): void {
+    if (this.editBrandId === null) {
+      this.errorMessage = 'Select a brand for product update.';
+      return;
+    }
+
+    this.savingProductId = productId;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    let specs: Record<string, string> | undefined;
+    if (this.editSpecsJson.trim()) {
+      try {
+        specs = JSON.parse(this.editSpecsJson) as Record<string, string>;
+      } catch {
+        this.savingProductId = null;
+        this.errorMessage = 'Specs must be valid JSON object.';
+        return;
+      }
+    }
+
+    this.api
+      .managerUpdateProduct(productId, {
+        name: this.editName.trim(),
+        description: this.editDescription.trim(),
+        price: this.editPrice.trim(),
+        image_url: this.editImageUrl.trim(),
+        brand_id: this.editBrandId,
+        specs,
+      })
+      .subscribe({
+        next: (updated) => {
+          const index = this.products.findIndex((item) => item.id === productId);
+          if (index >= 0) {
+            this.products[index] = updated;
+          }
+          this.savingProductId = null;
+          this.editingProductId = null;
+          this.successMessage = `Product ${updated.name} updated.`;
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          this.savingProductId = null;
+          if (!this.handlePermissionError(error)) {
+            this.errorMessage = this.api.getErrorMessage(error);
+          }
+          this.cdr.markForCheck();
+        },
+      });
+  }
+
+  deleteProduct(productId: number): void {
+    this.deletingProductId = productId;
+    this.errorMessage = '';
+    this.successMessage = '';
+
+    this.api.managerDeleteProduct(productId).subscribe({
+      next: () => {
+        this.products = this.products.filter((item) => item.id !== productId);
+        if (this.editingProductId === productId) {
+          this.cancelEditProduct();
+        }
+        this.deletingProductId = null;
+        this.successMessage = `Product #${productId} deleted.`;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        this.deletingProductId = null;
+        if (!this.handlePermissionError(error)) {
+          this.errorMessage = this.api.getErrorMessage(error);
+        }
+        this.cdr.markForCheck();
+      },
+    });
   }
 
   updateOrderStatus(order: Order): void {

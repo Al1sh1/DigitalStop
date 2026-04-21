@@ -92,7 +92,21 @@ button[disabled] {
   gap: 12px;
 }
 
+.products-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+
 .order-card {
+  border: 1px solid #d8e0ef;
+  border-radius: 10px;
+  background: #fff;
+  padding: 12px;
+}
+
+.product-card {
   border: 1px solid #d8e0ef;
   border-radius: 10px;
   background: #fff;
@@ -104,11 +118,36 @@ button[disabled] {
   color: #24375f;
 }
 
+.product-card p {
+  margin: 0 0 6px;
+  color: #24375f;
+}
+
 .status-actions {
   margin-top: 8px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 8px;
+}
+
+.row-actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.compact {
+  margin-top: 0;
+}
+
+.danger {
+  border-color: #d44c63;
+  color: #d44c63;
+}
+
+.danger:hover {
+  background: #fff3f5;
 }
 
 .error,

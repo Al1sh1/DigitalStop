@@ -1,8 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Product } from '../../core/models/api.models';
 import { ApiService } from '../../core/services/api.service';
+import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 
 @Component({
@@ -15,6 +17,7 @@ export class ProductDetailPageComponent implements OnInit {
   product: Product | null = null;
   specEntries: Array<{ key: string; value: string }> = [];
   quantity = 1;
+  canBuy = true;
   loading = false;
   errorMessage = '';
   actionMessage = '';
@@ -22,11 +25,14 @@ export class ProductDetailPageComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly api: ApiService,
+    private readonly authService: AuthService,
     private readonly cartService: CartService,
     private readonly cdr: ChangeDetectorRef,
   ) {}
 
   ngOnInit(): void {
+    this.resolvePurchaseAccess();
+
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!Number.isInteger(id) || id <= 0) {
       this.errorMessage = 'Invalid product id.';
@@ -45,6 +51,11 @@ export class ProductDetailPageComponent implements OnInit {
   }
 
   addToCart(): void {
+    if (!this.canBuy) {
+      this.actionMessage = 'Manager account cannot purchase products.';
+      return;
+    }
+
     if (!this.product) {
       return;
     }
@@ -88,5 +99,29 @@ export class ProductDetailPageComponent implements OnInit {
         return typeof value === 'string' && value.trim().length > 0;
       })
       .map(([key, value]) => ({ key, value }));
+  }
+
+  private resolvePurchaseAccess(): void {
+    if (!this.authService.isAuthenticated()) {
+      this.canBuy = true;
+      return;
+    }
+
+    this.api.managerGetOrders().subscribe({
+      next: () => {
+        this.canBuy = false;
+        this.cdr.markForCheck();
+      },
+      error: (error) => {
+        if (error instanceof HttpErrorResponse && (error.status === 401 || error.status === 403)) {
+          this.canBuy = true;
+          this.cdr.markForCheck();
+          return;
+        }
+
+        this.canBuy = true;
+        this.cdr.markForCheck();
+      },
+    });
   }
 }

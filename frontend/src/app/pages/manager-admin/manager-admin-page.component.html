@@ -64,6 +64,89 @@
 
     <section class="card">
       <div class="header-row">
+        <h3>Product Catalog</h3>
+        <button type="button" class="secondary" (click)="loadProducts()" [disabled]="loadingProducts">Refresh</button>
+      </div>
+
+      @if (loadingProducts) {
+        <p class="hint">Loading products...</p>
+      }
+
+      @if (!loadingProducts && !products.length) {
+        <p class="hint">No products found.</p>
+      }
+
+      <div class="products-grid">
+        @for (product of products; track product.id) {
+          <article class="product-card">
+            @if (editingProductId === product.id) {
+              <div class="form-grid compact">
+                <label>
+                  Name
+                  <input type="text" [(ngModel)]="editName" />
+                </label>
+
+                <label>
+                  Brand
+                  <select [(ngModel)]="editBrandId">
+                    @for (brand of brands; track brand.id) {
+                      <option [ngValue]="brand.id">{{ brand.name }}</option>
+                    }
+                  </select>
+                </label>
+
+                <label>
+                  Price
+                  <input type="text" [(ngModel)]="editPrice" />
+                </label>
+
+                <label>
+                  Image URL
+                  <input type="text" [(ngModel)]="editImageUrl" />
+                </label>
+
+                <label class="full">
+                  Description
+                  <textarea rows="3" [(ngModel)]="editDescription"></textarea>
+                </label>
+
+                <label class="full">
+                  Specs JSON
+                  <textarea rows="4" [(ngModel)]="editSpecsJson"></textarea>
+                </label>
+              </div>
+
+              <div class="row-actions">
+                <button type="button" (click)="saveProductChanges(product.id)" [disabled]="savingProductId === product.id">
+                  Save
+                </button>
+                <button type="button" class="secondary" (click)="cancelEditProduct()">Cancel</button>
+              </div>
+            } @else {
+              <p><strong>#{{ product.id }}</strong></p>
+              <p>Name: {{ product.name }}</p>
+              <p>Brand: {{ product.brand.name }}</p>
+              <p>Price: {{ formatPrice(product.price) }}</p>
+
+              <div class="row-actions">
+                <button type="button" (click)="startEditProduct(product)">Edit</button>
+                <button
+                  type="button"
+                  class="danger"
+                  (click)="deleteProduct(product.id)"
+                  [disabled]="deletingProductId === product.id"
+                >
+                  Delete
+                </button>
+              </div>
+            }
+          </article>
+        }
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="header-row">
         <h3>Delivery Status Tracking</h3>
         <button type="button" class="secondary" (click)="loadOrders()" [disabled]="loadingOrders">Refresh</button>
       </div>
@@ -83,7 +166,7 @@
             <p>Status: <strong>{{ order.status }}</strong></p>
             <p>Customer: {{ order.user.first_name }} {{ order.user.last_name }}</p>
             <p>Product: {{ order.product.name }}</p>
-            <p>Qty: {{ order.quantity }}</p>
+            <p>Quantity: {{ order.quantity }}</p>
             <p>Total: {{ formatPrice(order.total_price) }}</p>
 
             <div class="status-actions">
